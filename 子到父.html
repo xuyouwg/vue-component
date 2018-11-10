@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>父子组件及组件间数据传递</title>
+	<script src="node_modules/vue/dist/vue.js"></script> 
+	<script>
+		
+		var vm = null;
+		window.onload=function(){
+			vm = new Vue({
+				el:'#my',// 2.0不允许挂载到html,body元素上
+				data:{
+					flag:'my-hello'
+				},
+				components: { //局部组件
+					'my-parent': {
+						template:'#parent',
+						data(){
+							return {
+								page:40,
+								pname:'parent',
+								cage:'',
+								cname:'',
+								obj:{a:'a',b:'b'}
+							}
+						},
+						methods:{
+							getSubData(name,age) {
+								this.cage = age;
+								this.cname = name;
+							}
+						},
+						components:{
+							'my-child':{//子组件
+								data(){
+									return {
+										cage:'10',
+										cname:'child'
+									}
+								},
+								template:'#child',
+								props:['message','message2','obj'] , //父传到子
+	
+								methods:{
+									send(){
+	
+										this.$emit('e-child', this.cname, this.cage); //发送数据  emit发射/发送
+									},
+								}
+							}
+							
+						}
+					}
+				}
+			});
+		}
+	</script>
+</head>
+<template id="parent">
+	<div>
+		<h3>我是父组件，访问自己的数据：姓名-{{pname}},年龄-{{page}}</h3>
+		<h3 >我是父组件，接收子的数据：姓名-{{cname}}, 年龄-{{cage}}</h3>
+		<hr>
+		<!-- 父调用子 父传入子 -->
+		<my-child v-bind:message="page" :message2="pname" :obj="obj" v-on:e-child="getSubData"></my-child>
+
+		<!-- 子调用父 -->
+		<!-- <my-child @e-child="getSubData"></my-child> -->
+	</div>
+</template>
+<template id="child">
+	<div>
+		<h3>我是子组件，访问父的数据：姓名-{{message2}} ,年龄-{{message}}</h3>
+		<h3>我是子组件，访问自己的数据：年龄-{{cage}}, 姓名-{{cname}}</h3>
+		<button @click="send">将子组件的数据向上传递给父组件</button>
+	</div>
+</template>
+<body>
+	<div id="my">
+		<my-parent></my-parent>
+	</div>
+</body>
+</html>

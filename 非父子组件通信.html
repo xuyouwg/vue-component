@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>非父子组件间的通信</title>
+	<script src="node_modules/vue/dist/vue.js"></script>
+	<script>
+		// 定义一个空对象，用于触发和监听实例
+		var Bus = new Vue();
+		var A = {
+			template: '#a',
+			data(){
+				return {
+					name:'aaa'
+				}
+			},
+			methods:{
+				send(){
+					Bus.$emit('data-a', this.name);
+				}
+			}
+		}
+		var B = {
+			template: '#b',
+			data(){
+				return {
+					name:'bbb'
+				}
+			},
+			methods:{
+				send(){
+					Bus.$emit('data-b', this.name);
+				}
+			}
+		}
+		var C = {
+			template: '#c',
+			data(){
+				return {
+					nameA:'',
+					nameB:''
+				}
+			},
+			mounted(){
+				//这种写法取不到值
+				 Bus.$on('data-a', function(name){
+				 	this.name = name;
+				 });
+				 //箭头函数this总是指向函数定义生效时所在的对象
+				Bus.$on('data-b', name =>{    //$on接收
+					this.nameB = name;
+				});
+				Bus.$on('data-a', name =>{    //$on接收
+					this.nameA = name;
+				});
+			}
+		}
+
+		var vm = null;
+		window.onload=function(){
+			vm = new Vue({
+				el:'#my',
+				data:{
+				},
+				components: { //局部组件
+					'my-a': A,
+					'my-b': B,
+					'my-c': C
+				}
+			});
+		}
+	</script>
+</head>
+<template id="a">
+	<div>
+		<h3>组件a：{{name}}</h3>
+		<button @click="send">数据发给C</button>
+	</div>
+</template>
+<template id="b">
+	<div>
+		<h3>组件b：{{name}}</h3>
+		<button @click="send">数据发给C</button>
+	</div>
+</template>
+<template id="c">
+	<div>
+		<h3>组件c：{{nameA}} {{nameB}}</h3>
+	</div>
+</template>
+<body>
+	<div id="my">
+		<my-a></my-a>
+		<my-b></my-b>
+		<my-c></my-c>
+	</div>
+</body>
+</html>

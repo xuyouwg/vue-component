@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+   <title>软谋教育</title>
+    <script src="node_modules/vue/dist/vue.js"></script>
+    <script>
+    window.onload = function(){
+        Vue.component('my-world',{
+            template:'<h2>my world {{name}}</h2>',
+            data:function(){
+                return {
+                    msg:'123'
+                }
+            },
+            props:['name']    //父的值传到子
+        });
+        new Vue({
+            el:'#my',
+            data:{
+                value:'12345',
+                msg:'hello world',
+                name:'sonia',
+                arr:[1,2,3,4,5]
+            },
+            components:{   //局部组件
+                'my-address2':{
+                    template:'#myAddress',
+                    data:function(){
+                        return {
+                            title:'title',
+                            lists:[1,2,3,4,5]
+                        }
+                    },
+                    props:['msg']    //父的值传到子
+                }
+            }
+        })
+    }
+    </script>
+    
+    <!--模板-->
+ <template id="myAddress">
+     <div>
+         <p>{{title}}{{msg}}</p>
+         <ul>
+             <li v-for="list in lists">{{list}}</li>
+         </ul>
+     </div>
+ </template>
+ <body>
+<div id="my">
+   <my-world  :name="name"></my-world>
+   <my-address2 :msg="msg"></my-address2>
+   
+</div>
+</body>
+</html>
